@@ -165,9 +165,9 @@ export const app = defineApp({
             return error(request.requestId, 400, "Missing parameters");
           }
 
-          const { value: manifest } = await kv.app.get("manifest");
+          const { value: storedState } = await kv.app.get("state");
 
-          if (!manifest || manifest.state !== state) {
+          if (!storedState || storedState !== state) {
             return error(request.requestId, 400, "Invalid request");
           }
 
@@ -221,9 +221,9 @@ export const app = defineApp({
           }
 
           if (setup_action === "install") {
-            const { value } = await kv.app.get("manifest");
+            const { value: storedState } = await kv.app.get("state");
 
-            if (!value?.state || value?.state !== state) {
+            if (!storedState || storedState !== state) {
               return error(request.requestId, 400, "Invalid request");
             }
 
@@ -258,9 +258,9 @@ export const app = defineApp({
 
             await lifecycle.prompt.delete(createGitHubAppPromptKey);
 
-            await kv.app.delete(["manifest"]);
+            await kv.app.delete(["state"]);
 
-            await lifecycle.proceed();
+            await lifecycle.sync();
 
             return redirect(request.requestId, app.installationUrl);
           }
@@ -366,8 +366,11 @@ export const app = defineApp({
     },
   },
   onSync: async ({ app }) => {
-    const [{ value: installationId }, { value: manifest }] =
-      await kv.app.getMany(["installationId", "manifest"]);
+    let [
+      { value: installationId },
+      { value: state },
+      { value: storedOrganization },
+    ] = await kv.app.getMany(["installationId", "state", "organization"]);
 
     if (installationId) {
       const { value: repositories } = await kv.app.get("repositories");
@@ -380,43 +383,57 @@ export const app = defineApp({
       };
     }
 
-    if (!manifest) {
-      const url = app.http.url;
+    const url = app.http.url;
 
-      const state = randomBytes(32).toString("hex");
+    const manifest = {
+      callback_urls: [app.installationUrl],
+      default_events: [
+        "issues",
+        "workflow_run",
+        "pull_request",
+        "push",
+        "issue_comment",
+      ],
+      default_permissions: {
+        issues: "write",
+        actions: "write",
+        contents: "write",
+        pull_requests: "write",
+      },
+      hook_attributes: {
+        url: `${url}/webhook`,
+      },
+      setup_url: `${url}/setup`,
+      name: `Spacelift Flows GH Integration`,
+      public: false,
+      redirect_url: `${url}/redirect`,
+      url: "https://useflows.com",
+    };
 
-      const manifest = {
-        callback_urls: [app.installationUrl],
-        default_events: [
-          "issues",
-          "workflow_run",
-          "pull_request",
-          "push",
-          "issue_comment",
-        ],
-        default_permissions: {
-          issues: "write",
-          actions: "write",
-          contents: "write",
-          pull_requests: "write",
-        },
-        hook_attributes: {
-          url: `${url}/webhook`,
-        },
-        setup_url: `${url}/setup`,
-        name: `Spaceflows GH Integration`,
-        public: false,
-        redirect_url: `${url}/redirect`,
-        url: "https://spaceflows.io",
-      };
+    if (!state) {
+      state = randomBytes(32).toString("hex");
+
+      await kv.app.set({
+        key: "state",
+        value: state,
+      });
+    }
+
+    const currentOrganization = app.config.organization;
+    const shouldRecreatePrompt = storedOrganization !== currentOrganization;
+
+    if (shouldRecreatePrompt) {
+      if (app.prompts[createGitHubAppPromptKey]) {
+        await lifecycle.prompt.delete(createGitHubAppPromptKey);
+      }
 
       await lifecycle.prompt.create(
         createGitHubAppPromptKey,
         "Create a new app GitHub App",
         {
           redirect: {
-            url: app.config.organization
-              ? `https://github.com/organizations/${app.config.organization}/settings/apps/new`
+            url: currentOrganization
+              ? `https://github.com/organizations/${currentOrganization}/settings/apps/new`
               : `https://github.com/settings/apps/new`,
             method: "POST",
             formFields: {
@@ -428,10 +445,8 @@ export const app = defineApp({
       );
 
       await kv.app.set({
-        key: "manifest",
-        value: {
-          state,
-        },
+        key: "organization",
+        value: currentOrganization,
       });
     }
 
