@@ -420,10 +420,12 @@ export const app = defineApp({
     }
 
     const currentOrganization = app.config.organization;
-    const shouldRecreatePrompt = storedOrganization !== currentOrganization;
+    const hasOrganizationChanged = storedOrganization !== currentOrganization;
+    const hasPrompt = !!app.prompts[createGitHubAppPromptKey];
+    const shouldRecreatePrompt = hasOrganizationChanged || !hasPrompt;
 
     if (shouldRecreatePrompt) {
-      if (app.prompts[createGitHubAppPromptKey]) {
+      if (hasPrompt) {
         await lifecycle.prompt.delete(createGitHubAppPromptKey);
       }
 
