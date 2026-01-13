@@ -1,5 +1,5 @@
 import { getGitHubInstallation } from "../../github.ts";
-import { events } from "@slflows/sdk/v1";
+import { events, JsonSchema } from "@slflows/sdk/v1";
 import { defineGitHubBlock } from "../../utils/defineGitHubBlock.ts";
 import { owner, repo } from "../shared.ts";
 import outputSchema from "./createOrUpdateFileContents.json" with { type: "json" };
@@ -19,7 +19,7 @@ export const createOrUpdateFileContents = defineGitHubBlock({
   description:
     "Create a new file or update an existing file's contents in a repository",
   category: "Contents",
-  outputJsonSchema: outputSchema,
+  outputJsonSchema: outputSchema as JsonSchema,
   inputConfig: {
     owner,
     repo,

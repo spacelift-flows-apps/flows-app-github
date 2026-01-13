@@ -1,3 +1,4 @@
+import { JsonSchema } from "@slflows/sdk/v1";
 import { defineGitHubBlock } from "../../utils/defineGitHubBlock.ts";
 import {
   owner,
@@ -15,7 +16,7 @@ export const listPullRequests = defineGitHubBlock({
   description: "Lists pull requests from a repository with pagination support",
   category: "Pull requests",
   url: "GET /repos/{owner}/{repo}/pulls",
-  outputJsonSchema: outputSchema,
+  outputJsonSchema: outputSchema as JsonSchema,
   inputConfig: {
     owner,
     repo,

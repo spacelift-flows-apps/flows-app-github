@@ -74,7 +74,9 @@ type GitHubBlockParams<R extends Route> = {
     >
   >;
   staticConfig?: Record<string, any>;
-  outputJsonSchema: any;
+  outputJsonSchema: NonNullable<
+    NonNullable<AppBlock["outputs"]>[string]["type"]
+  >;
   onInternalMessage?: AppBlock["onInternalMessage"];
 } & (
   | {
