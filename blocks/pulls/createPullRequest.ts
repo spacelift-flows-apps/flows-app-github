@@ -1,3 +1,4 @@
+import { JsonSchema } from "@slflows/sdk/v1";
 import { defineGitHubBlock } from "../../utils/defineGitHubBlock.ts";
 import { owner, repo } from "../shared.ts";
 import outputSchema from "./createPullRequest.json" with { type: "json" };
@@ -8,7 +9,7 @@ export const createPullRequest = defineGitHubBlock({
   description: "Create a new pull request",
   category: "Pull requests",
   url: "POST /repos/{owner}/{repo}/pulls",
-  outputJsonSchema: outputSchema,
+  outputJsonSchema: outputSchema as JsonSchema,
   inputConfig: {
     owner,
     repo,

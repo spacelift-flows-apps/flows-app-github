@@ -1,5 +1,5 @@
 import { getGitHubInstallation } from "../../github.ts";
-import { events } from "@slflows/sdk/v1";
+import { events, JsonSchema } from "@slflows/sdk/v1";
 import { defineGitHubBlock } from "../../utils/defineGitHubBlock.ts";
 import { owner, repo } from "../shared.ts";
 import outputSchema from "./createReaction.json" with { type: "json" };
@@ -10,7 +10,7 @@ export const createReaction = defineGitHubBlock({
   name: "Create reaction",
   description: "Add a reaction to an issue, pull request, or comment",
   category: "Reactions",
-  outputJsonSchema: outputSchema,
+  outputJsonSchema: outputSchema as JsonSchema,
   inputConfig: {
     owner,
     repo,

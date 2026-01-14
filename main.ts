@@ -454,6 +454,7 @@ export const app = defineApp({
 
     return {
       newStatus: "in_progress",
+      nextScheduleDelay: null,
     };
   },
 });

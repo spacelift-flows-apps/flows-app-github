@@ -1,3 +1,4 @@
+import { JsonSchema } from "@slflows/sdk/v1";
 import { defineGitHubBlock } from "../../utils/defineGitHubBlock.ts";
 import { owner, repo, pullNumber } from "../shared.ts";
 import outputSchema from "./mergePullRequest.json" with { type: "json" };
@@ -7,7 +8,7 @@ export const mergePullRequest = defineGitHubBlock({
   description: "Merges a pull request with specified merge method",
   category: "Pull requests",
   url: "PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge",
-  outputJsonSchema: outputSchema,
+  outputJsonSchema: outputSchema as JsonSchema,
   inputConfig: {
     owner,
     repo,

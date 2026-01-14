@@ -1,5 +1,5 @@
 import { getGitHubInstallation } from "../../github.ts";
-import { events } from "@slflows/sdk/v1";
+import { events, JsonSchema } from "@slflows/sdk/v1";
 import outputSchema from "./createBranch.json" with { type: "json" };
 import { defineGitHubBlock } from "../../utils/defineGitHubBlock.ts";
 import { owner, repo } from "../shared.ts";
@@ -9,7 +9,7 @@ export const createBranch = defineGitHubBlock({
   name: "Create branch",
   description: "Create a new branch in a specified repository",
   category: "Branches",
-  outputJsonSchema: outputSchema,
+  outputJsonSchema: outputSchema as JsonSchema,
   inputConfig: {
     owner,
     repo,
