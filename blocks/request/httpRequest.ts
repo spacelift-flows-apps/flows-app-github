@@ -40,8 +40,8 @@ const accept = defineGitHubInputConfig({
   required: false,
 });
 
-export const plainRequest = defineGitHubBlock({
-  name: "Plain Request",
+export const httpRequest = defineGitHubBlock({
+  name: "HTTP Request",
   description: "Make a direct request to the GitHub API",
   category: "Request",
   inputConfig: {
