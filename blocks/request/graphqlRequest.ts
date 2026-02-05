@@ -43,15 +43,11 @@ export const graphqlRequest = defineGitHubBlock({
 
     const octokit = await getGitHubInstallation();
 
-    try {
-      const data = await octokit.graphql<Record<string, unknown>>(
-        queryValue,
-        variablesValue,
-      );
+    const data = await octokit.graphql<Record<string, unknown>>(
+      queryValue,
+      variablesValue,
+    );
 
-      await events.emit(convertKeysToCamelCase(data));
-    } catch (err) {
-      console.error((err as Error).message);
-    }
+    await events.emit(convertKeysToCamelCase(data));
   },
 });

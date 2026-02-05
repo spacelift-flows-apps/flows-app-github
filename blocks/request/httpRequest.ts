@@ -34,9 +34,20 @@ const requestBody = defineGitHubInputConfig({
 
 const accept = defineGitHubInputConfig({
   name: "Accept Header",
-  description:
-    'Optional Accept header value (e.g., "application/vnd.github.raw+json")',
-  type: "string",
+  description: "Optional Accept header value",
+  type: {
+    enum: [
+      "application/json",
+      "application/vnd.github+json",
+      "application/vnd.github.diff+json",
+      "application/vnd.github.patch+json",
+      "application/vnd.github.sha+json",
+      "application/vnd.github.full+json",
+      "application/vnd.github.raw+json",
+      "application/vnd.github.text+json",
+      "application/vnd.github.html+json",
+    ],
+  },
   required: false,
 });
 
@@ -66,21 +77,17 @@ export const httpRequest = defineGitHubBlock({
 
     const url = `${methodValue} ${pathValue}`;
 
-    try {
-      const { data } = await octokit.request(url, {
-        ...bodyValue,
-        ...(acceptValue
-          ? {
-              headers: {
-                Accept: acceptValue,
-              },
-            }
-          : {}),
-      });
+    const { data } = await octokit.request(url, {
+      ...bodyValue,
+      ...(acceptValue
+        ? {
+            headers: {
+              Accept: acceptValue,
+            },
+          }
+        : {}),
+    });
 
-      await events.emit(convertKeysToCamelCase(data));
-    } catch (err) {
-      console.error((err as Error).message);
-    }
+    await events.emit(convertKeysToCamelCase(data));
   },
 });
