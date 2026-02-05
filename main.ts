@@ -45,6 +45,9 @@ import { dispatchRepository } from "./blocks/repos/dispatchRepository.ts";
 import { dispatchWorkflow } from "./blocks/actions/dispatchWorkflow.ts";
 import { getPullRequestDiff } from "./blocks/pulls/getPullRequestDiff.ts";
 
+import { httpRequest } from "./blocks/request/httpRequest.ts";
+import { graphqlRequest } from "./blocks/request/graphqlRequest.ts";
+
 type SupportedEventType =
   | "issues"
   | "pull_request"
@@ -144,6 +147,9 @@ export const app = defineApp({
     dispatchRepository,
 
     dispatchWorkflow,
+
+    httpRequest,
+    graphqlRequest,
   },
   config: {
     organization: {
