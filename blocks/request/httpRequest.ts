@@ -35,19 +35,7 @@ const requestBody = defineGitHubInputConfig({
 const accept = defineGitHubInputConfig({
   name: "Accept Header",
   description: "Optional Accept header value",
-  type: {
-    enum: [
-      "application/json",
-      "application/vnd.github+json",
-      "application/vnd.github.diff+json",
-      "application/vnd.github.patch+json",
-      "application/vnd.github.sha+json",
-      "application/vnd.github.full+json",
-      "application/vnd.github.raw+json",
-      "application/vnd.github.text+json",
-      "application/vnd.github.html+json",
-    ],
-  },
+  type: "string",
   required: false,
 });
 
