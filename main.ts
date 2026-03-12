@@ -13,6 +13,7 @@ import { pullRequestSubscription } from "./blocks/webhooks/pullRequestSubscripti
 import { pushSubscription } from "./blocks/webhooks/pushSubscription.ts";
 import { workflowSubscription } from "./blocks/webhooks/workflowSubscription.ts";
 import { issueCommentSubscription } from "./blocks/webhooks/issueCommentSubscription.ts";
+import { webhookSubscription } from "./blocks/webhooks/webhookSubscription.ts";
 
 import { getCommit } from "./blocks/commits/getCommit.ts";
 import { listCommits } from "./blocks/commits/listCommits.ts";
@@ -116,6 +117,7 @@ export const app = defineApp({
     pushSubscription,
     workflowSubscription,
     issueCommentSubscription,
+    webhookSubscription,
 
     getCommit,
     listCommits,
@@ -316,29 +318,36 @@ export const app = defineApp({
 
             const eventType = event as string;
 
-            if (!(eventType in EVENT_CONFIG)) {
-              return json(request.requestId, {
-                message: "Event type not supported",
-                eventType,
-              });
-            }
-
-            const supportedEventType = eventType as SupportedEventType;
-            const config = EVENT_CONFIG[supportedEventType];
-
-            if (!config.validate(payload)) {
-              return error(
-                request.requestId,
-                400,
-                `Invalid ${eventType} event payload`,
-              );
-            }
-
-            const listOutput = await blocks.list({
-              typeIds: [config.blockTypeId],
+            // Always notify generic webhook subscription blocks.
+            const genericListOutput = await blocks.list({
+              typeIds: ["webhookSubscription"],
             });
 
-            if (listOutput.blocks.length === 0) {
+            const genericBlockIds = genericListOutput.blocks.map(
+              (block) => block.id,
+            );
+
+            // Also notify event-specific subscription blocks if the event type is supported.
+            let specificBlockIds: string[] = [];
+
+            if (eventType in EVENT_CONFIG) {
+              const supportedEventType = eventType as SupportedEventType;
+              const config = EVENT_CONFIG[supportedEventType];
+
+              if (config.validate(payload)) {
+                const specificListOutput = await blocks.list({
+                  typeIds: [config.blockTypeId],
+                });
+
+                specificBlockIds = specificListOutput.blocks.map(
+                  (block) => block.id,
+                );
+              }
+            }
+
+            const allBlockIds = [...specificBlockIds, ...genericBlockIds];
+
+            if (allBlockIds.length === 0) {
               return json(request.requestId, {
                 message: "No subscription blocks found",
                 eventType,
@@ -349,14 +358,15 @@ export const app = defineApp({
               body: {
                 headers: request.headers,
                 payload: payload,
+                eventType: eventType,
               },
-              blockIds: listOutput.blocks.map((block) => block.id),
+              blockIds: allBlockIds,
             });
 
             return json(request.requestId, {
               message: "ok",
               eventType,
-              blocksNotified: listOutput.blocks.length,
+              blocksNotified: allBlockIds.length,
             });
           } catch (err) {
             return error(
