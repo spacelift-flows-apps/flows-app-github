@@ -342,6 +342,10 @@ export const app = defineApp({
                 specificBlockIds = specificListOutput.blocks.map(
                   (block) => block.id,
                 );
+              } else {
+                console.warn(
+                  `Received ${eventType} webhook with invalid payload, skipping event-specific subscription blocks`,
+                );
               }
             }
 

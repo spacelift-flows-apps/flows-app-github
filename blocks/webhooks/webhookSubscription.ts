@@ -18,6 +18,8 @@ export const webhookSubscription = defineGitHubBlock({
           "The GitHub webhook event type (e.g. 'push', 'issues', 'pull_request', 'release', 'deployment', etc.)",
       },
       payload: {
+        type: "object",
+        additionalProperties: true,
         description:
           "The full webhook event payload with keys converted to camelCase",
       },
