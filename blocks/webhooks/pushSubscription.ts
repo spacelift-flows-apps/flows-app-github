@@ -7,6 +7,7 @@ export const pushSubscription = defineGitHubBlock({
   name: "On push",
   description: "Subscribes to repository push events",
   category: "Webhooks",
+  entrypoint: true,
   outputJsonSchema: "any",
   staticConfig: {
     owner,

@@ -67,6 +67,7 @@ type GitHubBlockParams<R extends Route> = {
   name: string;
   description: string;
   category: string;
+  entrypoint?: boolean;
   inputConfig?: Record<
     string,
     GitHubBlockInputConfigParams<
@@ -98,6 +99,7 @@ export function defineGitHubBlock<R extends Route>(
     name: params.name,
     description: params.description,
     category: params.category,
+    entrypoint: params.entrypoint,
     outputs: {
       default: {
         type: params.outputJsonSchema,
