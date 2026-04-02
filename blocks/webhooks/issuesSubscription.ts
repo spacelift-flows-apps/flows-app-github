@@ -8,6 +8,7 @@ export const issuesSubscription = defineGitHubBlock({
   name: "On issue",
   description: "Subscribes to issue events (created, updated, closed, etc.)",
   category: "Webhooks",
+  entrypoint: true,
   outputJsonSchema: "any",
   staticConfig: {
     owner,

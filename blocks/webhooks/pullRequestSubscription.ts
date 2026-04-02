@@ -9,6 +9,7 @@ export const pullRequestSubscription = defineGitHubBlock({
   description:
     "Subscribes to pull request events (opened, closed, review requested, etc.)",
   category: "Webhooks",
+  entrypoint: true,
   outputJsonSchema: "any",
   staticConfig: {
     owner,

@@ -9,6 +9,7 @@ export const issueCommentSubscription = defineGitHubBlock({
   description:
     "Subscribes to issue and pull request comment events (created, edited, deleted)",
   category: "Webhooks",
+  entrypoint: true,
   outputJsonSchema: "any",
   staticConfig: {
     owner,

@@ -8,6 +8,7 @@ export const workflowSubscription = defineGitHubBlock({
   name: "On workflow",
   description: "Subscribes to GitHub Actions workflow status changes",
   category: "Webhooks",
+  entrypoint: true,
   outputJsonSchema: "any",
   staticConfig: {
     owner,
